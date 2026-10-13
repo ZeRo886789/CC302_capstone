@@ -1,0 +1,39 @@
+name: pawquest
+description: "A portrait retro arcade maze game where cats collect fish."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.13.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flame: ^1.29.0
+  shared_preferences: ^2.5.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - assets/images/cats/mochi/
+    - assets/images/cats/luna/
+    - assets/images/cats/kuro/
+    - assets/images/collectibles/
+    - assets/images/effects/
+    - assets/images/goal/
+    - assets/images/tiles/blue/
+    - assets/images/tiles/extra/
+    - assets/images/tiles/gray/
+    - assets/images/tiles/green/
+    - assets/images/tiles/ice/
+    - assets/images/tiles/red/
+    - assets/images/ui/font/digits/
+    - assets/images/ui/font/letters/
+    - assets/images/ui/icons/
+
