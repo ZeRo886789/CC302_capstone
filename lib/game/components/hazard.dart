@@ -8,19 +8,16 @@ import '../config/game_config.dart';
 /// A hazard cell. Stepping on it costs the cat one heart, so it pulses to make
 /// it readable as dangerous.
 class Hazard extends SpriteComponent {
-  Hazard({
-    required Sprite sprite,
-    required this.gridX,
-    required this.gridY,
-  }) : super(
-          sprite: sprite,
-          position: Vector2(
-            GameConfig.cellCenterX(gridX),
-            GameConfig.cellCenterY(gridY),
-          ),
-          size: Vector2.all(GameConfig.hazardVisualSize),
-          anchor: Anchor.center,
-        ) {
+  Hazard({required Sprite sprite, required this.gridX, required this.gridY})
+    : super(
+        sprite: sprite,
+        position: Vector2(
+          GameConfig.cellCenterX(gridX),
+          GameConfig.cellCenterY(gridY),
+        ),
+        size: Vector2.all(GameConfig.hazardVisualSize),
+        anchor: Anchor.center,
+      ) {
     paint.filterQuality = FilterQuality.none;
     _phase = Random(gridX * 31 + gridY * 17).nextDouble() * pi * 2;
   }

@@ -101,27 +101,26 @@ class _GameScreenState extends State<GameScreen> {
                           onLevelSelect: game.goToLevelSelect,
                           onMainMenu: _backToMainMenu,
                         ),
-                         'levelComplete': (_, game) => LevelCompleteScreen(
-                           level: game.currentLevel,
-                           levelName: game.levelManager.levelData?.name ?? '',
-                           score: game.scoreManager.score,
-                           fishCollected: game.scoreManager.fishCollected,
-                           fishTotal: game.scoreManager.requiredFish,
-                           time: game.scoreManager.formattedTime,
-                           coinsEarned: game.lastLevelBonus,
-                           totalCoins: game.savedState.pawCoins,
-                           isLastLevel: game.currentLevel >=
-                               game.levelManager.levelCount,
-                           selectedCat: widget.selectedCat,
-                           onNextLevel: game.goToNextLevel,
-                           onRetry: game.retryLevel,
-                           onLevelSelect: game.goToLevelSelect,
-                           onMainMenu: _backToMainMenu,
-                         ),
+                        'levelComplete': (_, game) => LevelCompleteScreen(
+                          level: game.currentLevel,
+                          levelName: game.levelManager.levelData?.name ?? '',
+                          score: game.scoreManager.score,
+                          fishCollected: game.scoreManager.fishCollected,
+                          fishTotal: game.scoreManager.requiredFish,
+                          time: game.scoreManager.formattedTime,
+                          coinsEarned: game.lastLevelBonus,
+                          totalCoins: game.savedState.pawCoins,
+                          isLastLevel:
+                              game.currentLevel >= game.levelManager.levelCount,
+                          selectedCat: widget.selectedCat,
+                          onNextLevel: game.goToNextLevel,
+                          onRetry: game.retryLevel,
+                          onLevelSelect: game.goToLevelSelect,
+                          onMainMenu: _backToMainMenu,
+                        ),
                         'gameOver': (_, game) => GameOverScreen(
                           level: game.currentLevel,
-                          levelName:
-                              game.levelManager.levelData?.name ?? '',
+                          levelName: game.levelManager.levelData?.name ?? '',
                           score: game.scoreManager.score,
                           fishCollected: game.scoreManager.fishCollected,
                           fishTotal: game.scoreManager.requiredFish,
@@ -147,8 +146,9 @@ class _GameScreenState extends State<GameScreen> {
                                   horizontal: 12,
                                   vertical: 8,
                                 ),
-                                color: GameColors.background
-                                    .withValues(alpha: 0.85),
+                                color: GameColors.background.withValues(
+                                  alpha: 0.85,
+                                ),
                                 child: Text(
                                   message,
                                   style: const TextStyle(
@@ -172,7 +172,8 @@ class _GameScreenState extends State<GameScreen> {
                 onDirectionHeld: _game.holdDirection,
                 onDirectionReleased: (dir) => _game.releaseDirection(dir),
                 onPause: _game.togglePause,
-              ),            ),
+              ),
+            ),
           ],
         ),
       ),
@@ -245,19 +246,9 @@ class _GameScreenState extends State<GameScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
-        PixelText(
-          label,
-          height: 8,
-          spacing: 1,
-          color: labelColor,
-        ),
+        PixelText(label, height: 8, spacing: 1, color: labelColor),
         const SizedBox(height: 5),
-        PixelText(
-          value,
-          height: 16,
-          spacing: 1,
-          color: GameColors.white,
-        ),
+        PixelText(value, height: 16, spacing: 1, color: GameColors.white),
       ],
     );
   }
@@ -306,27 +297,27 @@ class _GameScreenState extends State<GameScreen> {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                   Image.asset(
-                      'assets/images/${PawAssets.fishIcon}',
-                     width: 18,
-                     height: 18,
-                     filterQuality: FilterQuality.none,
-                   ),
+                  Image.asset(
+                    'assets/images/${PawAssets.fishIcon}',
+                    width: 18,
+                    height: 18,
+                    filterQuality: FilterQuality.none,
+                  ),
                   const SizedBox(width: 4),
                   ValueListenableBuilder<int>(
                     valueListenable: _game.fishCollected,
                     builder: (context, collected, _) =>
                         ValueListenableBuilder<int>(
-                      valueListenable: _game.requiredFish,
-                      builder: (context, total, _) => Text(
-                        '$collected/$total',
-                        style: const TextStyle(
-                          color: GameColors.white,
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
+                          valueListenable: _game.requiredFish,
+                          builder: (context, total, _) => Text(
+                            '$collected/$total',
+                            style: const TextStyle(
+                              color: GameColors.white,
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
                   ),
                   const SizedBox(width: 14),
                   ValueListenableBuilder<String>(
@@ -424,7 +415,10 @@ class _GameScreenState extends State<GameScreen> {
                   width: 280,
                   child: Column(
                     children: [
-                      _completeRow('LEVELS', '${Levels.all.length}/${Levels.all.length}'),
+                      _completeRow(
+                        'LEVELS',
+                        '${Levels.all.length}/${Levels.all.length}',
+                      ),
                       const SizedBox(height: 10),
                       _completeRow('FISH FOUND', '$totalFish/$totalFish'),
                       const SizedBox(height: 10),

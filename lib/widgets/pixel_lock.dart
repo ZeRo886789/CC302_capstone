@@ -31,24 +31,12 @@ class _PixelLockPainter extends CustomPainter {
     final dark = Paint()..color = GameColors.background;
 
     // Shackle: two uprights joined by a solid bar.
-    canvas.drawRect(
-      Rect.fromLTWH(unit * 2, unit * 1, unit, unit * 3),
-      paint,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(unit * 5, unit * 1, unit, unit * 3),
-      paint,
-    );
-    canvas.drawRect(
-      Rect.fromLTWH(unit * 2, unit * 1, unit * 4, unit),
-      paint,
-    );
+    canvas.drawRect(Rect.fromLTWH(unit * 2, unit * 1, unit, unit * 3), paint);
+    canvas.drawRect(Rect.fromLTWH(unit * 5, unit * 1, unit, unit * 3), paint);
+    canvas.drawRect(Rect.fromLTWH(unit * 2, unit * 1, unit * 4, unit), paint);
 
     // Body.
-    canvas.drawRect(
-      Rect.fromLTWH(unit, unit * 4, unit * 6, unit * 3),
-      paint,
-    );
+    canvas.drawRect(Rect.fromLTWH(unit, unit * 4, unit * 6, unit * 3), paint);
 
     // Keyhole punched back out.
     canvas.drawRect(
@@ -62,5 +50,6 @@ class _PixelLockPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_PixelLockPainter oldDelegate) => oldDelegate.color != color;
+  bool shouldRepaint(_PixelLockPainter oldDelegate) =>
+      oldDelegate.color != color;
 }

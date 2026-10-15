@@ -12,14 +12,19 @@ class GridPoint {
 enum FinishStyle {
   /// Level 1: Warm welcoming gate with gentle glow
   welcomingGate,
+
   /// Level 2: Magical portal with floating particles
   magicalPortal,
+
   /// Level 3: Crystal gate with pulsing energy
   crystalGate,
+
   /// Level 4: Epic archway with dramatic effects
   epicArchway,
+
   /// Level 5: Final destination - grand victory portal
   victoryPortal,
+
   /// Default fallback
   standard,
 }
@@ -174,9 +179,7 @@ class LevelData {
     final spawn = playerStart;
 
     final queue = <GridPoint>[spawn];
-    final visited = <String>{
-      '${spawn.x},${spawn.y}',
-    };
+    final visited = <String>{'${spawn.x},${spawn.y}'};
 
     while (queue.isNotEmpty) {
       final current = queue.removeAt(0);
@@ -192,10 +195,7 @@ class LevelData {
         final nx = current.x + direction[0];
         final ny = current.y + direction[1];
 
-        if (nx < 0 ||
-            ny < 0 ||
-            nx >= width ||
-            ny >= height) {
+        if (nx < 0 || ny < 0 || nx >= width || ny >= height) {
           continue;
         }
 
@@ -207,9 +207,7 @@ class LevelData {
 
         visited.add(key);
 
-        queue.add(
-          GridPoint(nx, ny),
-        );
+        queue.add(GridPoint(nx, ny));
       }
     }
 
@@ -236,9 +234,7 @@ class LevelData {
     final spawn = playerStart;
 
     final queue = <GridPoint>[spawn];
-    final visited = <String>{
-      '${spawn.x},${spawn.y}',
-    };
+    final visited = <String>{'${spawn.x},${spawn.y}'};
 
     while (queue.isNotEmpty) {
       final current = queue.removeAt(0);
@@ -254,10 +250,7 @@ class LevelData {
         final nx = current.x + direction[0];
         final ny = current.y + direction[1];
 
-        if (nx < 0 ||
-            ny < 0 ||
-            nx >= width ||
-            ny >= height) {
+        if (nx < 0 || ny < 0 || nx >= width || ny >= height) {
           continue;
         }
 
@@ -270,15 +263,11 @@ class LevelData {
 
         visited.add(key);
 
-        queue.add(
-          GridPoint(nx, ny),
-        );
+        queue.add(GridPoint(nx, ny));
       }
     }
 
-    if (!visited.contains(
-      '${exitPosition.x},${exitPosition.y}',
-    )) {
+    if (!visited.contains('${exitPosition.x},${exitPosition.y}')) {
       throw StateError(
         'Level $number ($name): '
         'exit requires stepping on a hazard.',

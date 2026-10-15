@@ -17,6 +17,7 @@ import 'config/game_colors.dart';
 import 'config/game_config.dart';
 import 'config/paw_assets.dart';
 import 'data/levels.dart';
+import '../models/history_entry.dart';
 import 'systems/collision_system.dart';
 import 'systems/level_manager.dart';
 import 'systems/score_manager.dart';
@@ -30,14 +31,14 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
     required this.onGameComplete,
     this.onExitToLevelSelect = _noop,
   }) : super(
-          // Flame's documented shape: the World holds game objects and the
-          // camera observes it. The camera is NOT a child of the world.
-          world: World(),
-          camera: CameraComponent.withFixedResolution(
-            width: GameConfig.cameraWidth,
-            height: GameConfig.cameraHeight,
-          ),
-        );
+         // Flame's documented shape: the World holds game objects and the
+         // camera observes it. The camera is NOT a child of the world.
+         world: World(),
+         camera: CameraComponent.withFixedResolution(
+           width: GameConfig.cameraWidth,
+           height: GameConfig.cameraHeight,
+         ),
+       );
 
   static void _noop() {}
 
@@ -80,19 +81,22 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
   bool isPaused = false;
   bool _isQuitting = false;
 
-   PlayerDirection? _heldDirection;
-   final Set<PlayerDirection> _heldDirections = {};
-   double _hudClock = 0;
+  PlayerDirection? _heldDirection;
+  final Set<PlayerDirection> _heldDirections = {};
+  double _hudClock = 0;
 
   /// Pushes HUD state to any listening widgets. Writing to a ValueNotifier while
   /// the tree is building throws, so the very first sync (which happens inside
   /// GameWidget's first frame) is deferred to a post-frame callback.
   void _pushHudToWidgets() {
     final phase = SchedulerBinding.instance.schedulerPhase;
-    final midBuild = phase == SchedulerPhase.persistentCallbacks ||
+    final midBuild =
+        phase == SchedulerPhase.persistentCallbacks ||
         phase == SchedulerPhase.midFrameMicrotasks;
     if (midBuild) {
-      SchedulerBinding.instance.addPostFrameCallback((_) => _pushHudToWidgets());
+      SchedulerBinding.instance.addPostFrameCallback(
+        (_) => _pushHudToWidgets(),
+      );
       return;
     }
     score.value = scoreManager.score;
@@ -185,11 +189,8 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
     }
 
     final exit = data.exitPosition;
-    final flag = FinishFlag(
-      levelData: data,
-      gridX: exit.x,
-      gridY: exit.y,
-    )..active = false;
+    final flag = FinishFlag(levelData: data, gridX: exit.x, gridY: exit.y)
+      ..active = false;
     if (_stale(generation, flag)) {
       flag.removeFromParent();
       return;
@@ -214,8 +215,7 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
 
     final light = PlayerLight(
       getPlayerPosition: () {
-        return player?.position.clone() ??
-            Vector2.zero();
+        return player?.position.clone() ?? Vector2.zero();
       },
       radiusTiles: data.lightRadiusTiles,
     );
@@ -257,11 +257,9 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
     final p = player;
     if (p == null) return;
 
-    final halfWidth =
-        GameConfig.cameraWidth / 2;
+    final halfWidth = GameConfig.cameraWidth / 2;
 
-    final halfHeight =
-        GameConfig.cameraHeight / 2;
+    final halfHeight = GameConfig.cameraHeight / 2;
 
     // Viewfinder.position is a getter that returns a copy of the
     // camera's focus point (-transform.offset). It must be assigned
@@ -270,16 +268,10 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
     // would never move.
     camera.viewfinder.position = Vector2(
       p.position.x
-          .clamp(
-            halfWidth,
-            GameConfig.boardWidth - halfWidth,
-          )
+          .clamp(halfWidth, GameConfig.boardWidth - halfWidth)
           .toDouble(),
       p.position.y
-          .clamp(
-            halfHeight,
-            GameConfig.boardHeight - halfHeight,
-          )
+          .clamp(halfHeight, GameConfig.boardHeight - halfHeight)
           .toDouble(),
     );
   }
@@ -297,25 +289,18 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
     final minY = halfHeight;
     final maxY = GameConfig.boardHeight - halfHeight;
 
-    final targetX = p.position.x
-        .clamp(minX, maxX)
-        .toDouble();
+    final targetX = p.position.x.clamp(minX, maxX).toDouble();
 
-    final targetY = p.position.y
-        .clamp(minY, maxY)
-        .toDouble();
+    final targetY = p.position.y.clamp(minY, maxY).toDouble();
 
     final current = camera.viewfinder.position;
 
     const followSpeed = 12.0;
 
-    final amount = 1 -
-        math.exp(-followSpeed * dt);
+    final amount = 1 - math.exp(-followSpeed * dt);
 
-    final nextX =
-        current.x + (targetX - current.x) * amount;
-    final nextY =
-        current.y + (targetY - current.y) * amount;
+    final nextX = current.x + (targetX - current.x) * amount;
+    final nextY = current.y + (targetY - current.y) * amount;
 
     // Assign through the setter. The position getter returns a
     // copy, so mutating current.x/current.y in place would never
@@ -439,7 +424,7 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
     _setupLevel();
   }
 
-  void completeLevel() {
+  Future<void> completeLevel() async {
     if (levelCompleting) return;
     levelCompleting = true;
     _heldDirection = null;
@@ -459,8 +444,19 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
     // Records the clear, unlocks the next level, and awards first-clear
     // Paw Coins (exactly once). Luna and Mochi become AVAILABLE this way;
     // buying them is still required.
+    final levelName = levelManager.levelData?.name ?? 'Unknown';
     savedState.onLevelCompleted(currentLevel);
-    SaveManager.save(savedState);
+    savedState.addAdventureHistoryEntry(
+      HistoryEntry(
+        id: null,
+        level: currentLevel,
+        levelName: levelName,
+        score: scoreManager.score,
+        formattedTime: scoreManager.formattedTime,
+        date: DateTime.now(),
+      ),
+    );
+    await SaveManager.save(savedState);
 
     if (isLastLevel) {
       showGameComplete();
@@ -561,7 +557,8 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
   void _showHpHint() {
     if (_hintCooldown > 0) return;
     _hintCooldown = 60;
-    hint.value = 'OUCH!  ${hp.value} ${hp.value == 1 ? 'HEART' : 'HEARTS'} LEFT';
+    hint.value =
+        'OUCH!  ${hp.value} ${hp.value == 1 ? 'HEART' : 'HEARTS'} LEFT';
   }
 
   void _triggerGameOver() {
@@ -618,8 +615,8 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
     // half a tile). This ensures the level completes reliably when the player
     // visually reaches the finish flag sprite, without requiring them to
     // travel beyond the visible finish.
-    final atExit = (p.gridX == exit.x && p.gridY == exit.y) ||
-        distance < (tileSize * 0.5);
+    final atExit =
+        (p.gridX == exit.x && p.gridY == exit.y) || distance < (tileSize * 0.5);
 
     if (!atExit) return;
 
@@ -650,13 +647,17 @@ class PawQuestGame extends FlameGame with KeyboardEvents {
       if (event is KeyUpEvent) {
         // Re-evaluate which movement key is still held so that releasing
         // one arrow key does not kill movement when another is still down.
-        final up = keysPressed.contains(LogicalKeyboardKey.arrowUp) ||
+        final up =
+            keysPressed.contains(LogicalKeyboardKey.arrowUp) ||
             keysPressed.contains(LogicalKeyboardKey.keyW);
-        final down = keysPressed.contains(LogicalKeyboardKey.arrowDown) ||
+        final down =
+            keysPressed.contains(LogicalKeyboardKey.arrowDown) ||
             keysPressed.contains(LogicalKeyboardKey.keyS);
-        final left = keysPressed.contains(LogicalKeyboardKey.arrowLeft) ||
+        final left =
+            keysPressed.contains(LogicalKeyboardKey.arrowLeft) ||
             keysPressed.contains(LogicalKeyboardKey.keyA);
-        final right = keysPressed.contains(LogicalKeyboardKey.arrowRight) ||
+        final right =
+            keysPressed.contains(LogicalKeyboardKey.arrowRight) ||
             keysPressed.contains(LogicalKeyboardKey.keyD);
 
         // Determine which direction was released by inferring from the key

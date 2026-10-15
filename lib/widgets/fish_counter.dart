@@ -4,11 +4,7 @@ import '../game/config/game_colors.dart';
 import '../game/config/paw_assets.dart';
 
 class FishCounter extends StatelessWidget {
-  const FishCounter({
-    super.key,
-    required this.collected,
-    required this.total,
-  });
+  const FishCounter({super.key, required this.collected, required this.total});
 
   final int collected;
   final int total;

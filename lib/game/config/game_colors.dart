@@ -18,5 +18,11 @@ class GameColors {
   static const Color border = Color(0xFF2A2A4A);
   static const Color panelBlue = Color(0xFF2A5BD7);
 
+  static const Color factText = Color(0xFFF2F2F2);
+  static const Color factCaption = Color(0xFFB0B6C3);
+  static const Color trashRed = Color(0xFFFF5252);
+  static const Color heartOff = Color(0xFFFFFFFF);
+  static const Color heartOn = Color(0xFFFF6B6B);
+
   static const Color hudBackground = Color(0x800D0D1A);
 }

@@ -41,11 +41,7 @@ class GameOverScreen extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const PixelText(
-                  'GAME OVER',
-                  height: 14,
-                  color: GameColors.red,
-                ),
+                const PixelText('GAME OVER', height: 14, color: GameColors.red),
                 const SizedBox(height: 18),
                 Opacity(
                   opacity: 0.85,

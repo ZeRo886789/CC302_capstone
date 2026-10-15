@@ -4,7 +4,8 @@ class PawAssets {
   static const double catFrameSize = 128.0;
   static const int catFramesPerRow = 4;
 
-  static String catSheet(String catName) => 'cats/$catName/${catName}_spritesheet.png';
+  static String catSheet(String catName) =>
+      'cats/$catName/${catName}_spritesheet.png';
 
   static String catFrame(String catName, String anim, int frame) =>
       'cats/$catName/${anim}_$frame.png';
@@ -31,7 +32,8 @@ class PawAssets {
   static const String finishFlag = 'goal/finish_flag.png';
 
   static String wall(String theme) => 'tiles/$theme/wall.png';
-  static String wallVariant(String theme, int i) => 'tiles/$theme/wall_${i % 8}.png';
+  static String wallVariant(String theme, int i) =>
+      'tiles/$theme/wall_${i % 8}.png';
 
   static String floor(String theme) => 'tiles/$theme/floor.png';
   static const String floorDark = 'tiles/extra/floor_dark.png';

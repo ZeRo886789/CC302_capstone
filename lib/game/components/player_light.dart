@@ -10,16 +10,11 @@ import '../config/game_config.dart';
 /// follows the cat; the far side of the maze is dimmed but never pitch
 /// black, keeping the mood relaxing rather than horror-like.
 class PlayerLight extends PositionComponent {
-  PlayerLight({
-    required this.getPlayerPosition,
-    required this.radiusTiles,
-  }) : super(
-          position: Vector2.zero(),
-          size: Vector2(
-            GameConfig.boardWidth,
-            GameConfig.boardHeight,
-          ),
-        );
+  PlayerLight({required this.getPlayerPosition, required this.radiusTiles})
+    : super(
+        position: Vector2.zero(),
+        size: Vector2(GameConfig.boardWidth, GameConfig.boardHeight),
+      );
 
   final Vector2 Function() getPlayerPosition;
 
@@ -32,8 +27,7 @@ class PlayerLight extends PositionComponent {
   /// side of the paint box, which keeps the light perfectly circular
   /// on the 360x504 world instead of stretching it into an ellipse.
   double get _radiusFraction =>
-      radius /
-      math.min(GameConfig.boardWidth, GameConfig.boardHeight);
+      radius / math.min(GameConfig.boardWidth, GameConfig.boardHeight);
 
   @override
   void render(Canvas canvas) {
@@ -60,12 +54,7 @@ class PlayerLight extends PositionComponent {
         Color(0x47000000),
         Color(0x73000000),
       ],
-      stops: const [
-        0.0,
-        0.45,
-        0.75,
-        1.0,
-      ],
+      stops: const [0.0, 0.45, 0.75, 1.0],
     ).createShader(rect);
 
     final paint = Paint()..shader = shader;

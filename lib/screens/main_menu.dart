@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'dart:math' show min;
+
 import '../game/config/game_colors.dart';
 import '../game/systems/save_manager.dart';
 import '../widgets/arcade_panel.dart';
 import '../widgets/pixel_text.dart';
 import 'cat_select.dart';
+import 'adventure_history_screen.dart';
+import 'cat_facts_screen.dart';
 import 'game_screen.dart';
 import 'level_select.dart';
 import 'settings_screen.dart';
@@ -27,6 +31,8 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     'SELECT CAT',
     'SHOP',
     'SELECT LEVEL',
+    'CAT FACTS',
+    'ADVENTURE HISTORY',
     'SETTINGS',
   ];
 
@@ -106,6 +112,20 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
       case 3:
         _openLevelSelect(state);
       case 4:
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(builder: (context) => const CatFactsScreen()),
+            )
+            .then((_) => _reload());
+      case 5:
+        Navigator.of(context)
+            .push(
+              MaterialPageRoute(
+                builder: (context) => const AdventureHistoryScreen(),
+              ),
+            )
+            .then((_) => _reload());
+      case 6:
         _openSettings();
     }
   }
@@ -120,8 +140,9 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
     }
     if (event.logicalKey == LogicalKeyboardKey.arrowUp ||
         event.logicalKey == LogicalKeyboardKey.keyW) {
-      setState(() =>
-          _selected = (_selected - 1 + _items.length) % _items.length);
+      setState(
+        () => _selected = (_selected - 1 + _items.length) % _items.length,
+      );
       return KeyEventResult.handled;
     }
     if (event.logicalKey == LogicalKeyboardKey.enter ||
@@ -152,10 +173,15 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
               return LayoutBuilder(
                 builder: (context, constraints) {
                   final compact = constraints.maxHeight < 640;
+                  final double buttonWidth = min(
+                    280,
+                    constraints.maxWidth * 0.8,
+                  );
                   return SingleChildScrollView(
                     child: ConstrainedBox(
-                      constraints:
-                          BoxConstraints(minHeight: constraints.maxHeight),
+                      constraints: BoxConstraints(
+                        minHeight: constraints.maxHeight,
+                      ),
                       child: Center(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -174,14 +200,14 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                               ShaderMask(
                                 shaderCallback: (bounds) =>
                                     const LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [
-                                    GameColors.yellow,
-                                    GameColors.orange,
-                                    GameColors.red,
-                                  ],
-                                ).createShader(bounds),
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        GameColors.yellow,
+                                        GameColors.orange,
+                                        GameColors.red,
+                                      ],
+                                    ).createShader(bounds),
                                 child: const Text(
                                   'PAWQUEST',
                                   style: TextStyle(
@@ -202,7 +228,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                               ),
                               SizedBox(height: compact ? 20 : 36),
                               SizedBox(
-                                width: 260,
+                                width: buttonWidth,
                                 child: Column(
                                   children: [
                                     for (var i = 0; i < _items.length; i++) ...[
@@ -214,6 +240,7 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                                           setState(() => _selected = i);
                                           _activate(state);
                                         },
+                                        buttonWidth: buttonWidth,
                                       ),
                                     ],
                                   ],
@@ -239,9 +266,10 @@ class _MainMenuScreenState extends State<MainMenuScreen> {
                                     ),
                                     const SizedBox(height: 6),
                                     PixelText(
-                                      state.highScore
-                                          .toString()
-                                          .padLeft(5, '0'),
+                                      state.highScore.toString().padLeft(
+                                        5,
+                                        '0',
+                                      ),
                                       height: 18,
                                       color: GameColors.white,
                                     ),
@@ -269,19 +297,22 @@ class _MenuRow extends StatelessWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
+    required this.buttonWidth,
   });
 
   final String label;
   final bool isSelected;
   final VoidCallback onTap;
+  final double buttonWidth;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        width: buttonWidth,
         height: 40,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 2),
         decoration: BoxDecoration(
           color: isSelected ? GameColors.panelBlue : GameColors.panelDark,
           border: Border.all(
@@ -291,24 +322,25 @@ class _MenuRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            SizedBox(
-              width: 18,
-              child: isSelected
-                  ? const Icon(
-                      Icons.chevron_right,
-                      size: 18,
-                      color: GameColors.yellow,
-                    )
-                  : null,
-            ),
+            if (isSelected)
+              const Icon(
+                Icons.chevron_right,
+                size: 18,
+                color: GameColors.yellow,
+              )
+            else
+              const SizedBox(width: 18),
+            const SizedBox(width: 4),
             Text(
               label,
               style: TextStyle(
                 color: isSelected ? GameColors.yellow : GameColors.white,
-                fontSize: 14,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
-                letterSpacing: 2,
+                letterSpacing: 1,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),

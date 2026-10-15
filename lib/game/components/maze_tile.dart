@@ -8,11 +8,11 @@ class MazeTile extends SpriteComponent {
     required Vector2 position,
     required Vector2 size,
   }) : super(
-          sprite: sprite,
-          position: position,
-          size: size,
-          anchor: Anchor.topLeft,
-        ) {
+         sprite: sprite,
+         position: position,
+         size: size,
+         anchor: Anchor.topLeft,
+       ) {
     paint.filterQuality = FilterQuality.none;
   }
 }

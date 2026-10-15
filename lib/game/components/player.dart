@@ -29,12 +29,12 @@ class Player extends SpriteAnimationGroupComponent<_PlayerAnim> {
     required Vector2 position,
     required double visualSize,
   }) : super(
-          animations: animations,
-          current: _PlayerAnim.idle,
-          size: Vector2.all(visualSize),
-          position: position,
-          anchor: Anchor.center,
-        ) {
+         animations: animations,
+         current: _PlayerAnim.idle,
+         size: Vector2.all(visualSize),
+         position: position,
+         anchor: Anchor.center,
+       ) {
     paint.filterQuality = FilterQuality.none;
   }
 
@@ -94,14 +94,14 @@ class Player extends SpriteAnimationGroupComponent<_PlayerAnim> {
     anims[_PlayerAnim.idle] = await load('idle', _CatAnim.idleStepTime);
 
     return Player._(
-      catName: catName,
-      animations: anims,
-      position: Vector2(
-        GameConfig.cellCenterX(gridX),
-        GameConfig.cellCenterY(gridY),
-      ),
-      visualSize: visualSize,
-    )
+        catName: catName,
+        animations: anims,
+        position: Vector2(
+          GameConfig.cellCenterX(gridX),
+          GameConfig.cellCenterY(gridY),
+        ),
+        visualSize: visualSize,
+      )
       ..gridX = gridX
       ..gridY = gridY
       .._previousGridX = gridX
@@ -149,10 +149,8 @@ class Player extends SpriteAnimationGroupComponent<_PlayerAnim> {
     paint.color = previous;
   }
 
-  Vector2 _gridCenter(int x, int y) => Vector2(
-        GameConfig.cellCenterX(x),
-        GameConfig.cellCenterY(y),
-      );
+  Vector2 _gridCenter(int x, int y) =>
+      Vector2(GameConfig.cellCenterX(x), GameConfig.cellCenterY(y));
 
   static _PlayerAnim _animFor(PlayerDirection dir) {
     switch (dir) {
@@ -179,7 +177,10 @@ class Player extends SpriteAnimationGroupComponent<_PlayerAnim> {
     position.setFrom(_gridCenter(gridX, gridY));
   }
 
-  bool canStartMove(PlayerDirection dir, bool Function(int x, int y) canMoveTo) {
+  bool canStartMove(
+    PlayerDirection dir,
+    bool Function(int x, int y) canMoveTo,
+  ) {
     if (_knockback) return false;
     return !isMoving && canMoveTo(gridX + _dx(dir), gridY + _dy(dir));
   }

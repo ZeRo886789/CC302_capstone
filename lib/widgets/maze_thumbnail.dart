@@ -6,11 +6,7 @@ import '../game/data/level_data.dart';
 /// Miniature preview of a level drawn straight from its grid data, tinted with
 /// the level's accent colour.
 class MazeThumbnail extends StatelessWidget {
-  const MazeThumbnail({
-    super.key,
-    required this.data,
-    required this.accent,
-  });
+  const MazeThumbnail({super.key, required this.data, required this.accent});
 
   final LevelData data;
   final Color accent;
@@ -41,8 +37,7 @@ class _MazeThumbnailPainter extends CustomPainter {
     final originY = (size.height - cell * rows) / 2;
 
     final wallPaint = Paint()..color = accent;
-    final floorPaint = Paint()
-      ..color = accent.withValues(alpha: 0.10);
+    final floorPaint = Paint()..color = accent.withValues(alpha: 0.10);
     final fishPaint = Paint()..color = GameColors.yellow;
     final exitPaint = Paint()..color = GameColors.red;
     final spawnPaint = Paint()..color = GameColors.white;
@@ -79,12 +74,7 @@ class _MazeThumbnailPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
     canvas.drawRect(
-      Rect.fromLTWH(
-        originX,
-        originY,
-        cell * cols,
-        cell * rows,
-      ),
+      Rect.fromLTWH(originX, originY, cell * cols, cell * rows),
       frame,
     );
   }

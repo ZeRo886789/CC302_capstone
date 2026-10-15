@@ -59,15 +59,14 @@ class _LevelSelectScreenState extends State<LevelSelectScreen> {
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       return GridView.builder(
-                        padding:
-                            const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          childAspectRatio: 0.72,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
-                        ),
+                              crossAxisCount: 2,
+                              childAspectRatio: 0.72,
+                              crossAxisSpacing: 12,
+                              mainAxisSpacing: 12,
+                            ),
                         itemCount: Levels.all.length,
                         itemBuilder: (context, index) {
                           final level = index + 1;

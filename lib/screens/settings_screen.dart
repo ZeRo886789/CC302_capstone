@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../game/config/game_colors.dart';
 import '../game/systems/save_manager.dart';
 import '../widgets/arcade_panel.dart';
+import '../widgets/confirm_dialog.dart';
 
 /// Settings contains only controls that actually do something: there are no
 /// audio assets in the project, so no sound/music toggles are shown.
@@ -17,12 +18,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _resetting = false;
 
   Future<void> _resetProgress() async {
+    bool confirmed = await showConfirmDialog(
+      context,
+      title: 'Reset progress?',
+      message: 'This will permanently erase all saved progress. This can\'t be undone.',
+      confirmLabel: 'Reset',
+      cancelLabel: 'Cancel',
+    );
+    if (!confirmed) return;
+
     setState(() => _resetting = true);
     await SaveManager.resetProgress();
     if (!mounted) return;
     setState(() => _resetting = false);
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('PROGRESS RESET')),
+      SnackBar(
+        backgroundColor: GameColors.panelDark,
+        content: const Text('Progress reset'),
+        duration: const Duration(seconds: 4),
+      ),
     );
   }
 
@@ -40,10 +54,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text(
+                  Text(
                     'SETTINGS',
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: GameColors.yellow,
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -51,10 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  _buildRow(
-                    'CONTROLS',
-                    'WASD / ARROWS / DPAD',
-                  ),
+                  _buildRow('CONTROLS', 'WASD / ARROWS / DPAD'),
                   const SizedBox(height: 12),
                   _buildRow('AUDIO', 'NOT INCLUDED'),
                   const SizedBox(height: 24),
@@ -66,10 +77,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         backgroundColor: GameColors.panelDark,
                         foregroundColor: GameColors.red,
                         shape: const RoundedRectangleBorder(
-                          side: BorderSide(
-                            color: GameColors.red,
-                            width: 3,
-                          ),
+                          side: BorderSide(color: GameColors.red, width: 3),
                           borderRadius: BorderRadius.zero,
                         ),
                       ),

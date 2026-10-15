@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../data/cat_data.dart';
 import '../data/levels.dart';
+import '../../models/history_entry.dart';
 
 class SaveManager {
   SaveManager._();
@@ -16,6 +17,7 @@ class SaveManager {
   static const String _highScoreKey = 'high_score';
   static const String _pawCoinsKey = 'paw_coins';
   static const String _completedLevelsKey = 'completed_levels';
+  static const String _adventureHistoryKey = 'adventure_history';
 
   /// Kuro is the default protagonist, so a fresh save always has him unlocked.
   static const String defaultCat = 'kuro';
@@ -26,16 +28,17 @@ class SaveManager {
       highestUnlockedLevel: prefs.getInt(_highestLevelKey) ?? 1,
       lunaOwned: prefs.getBool(_lunaOwnedKey) ?? false,
       mochiOwned: prefs.getBool(_mochiOwnedKey) ?? false,
-      selectedCat: prefs.getString(_selectedCatKey) ?? defaultCat,
+      selectedCat: prefs.getString(_selectedCatKey) ?? SaveManager.defaultCat,
       highScore: prefs.getInt(_highScoreKey) ?? 0,
       pawCoins: prefs.getInt(_pawCoinsKey) ?? 0,
       completedLevels: _readCompletedLevels(prefs),
+      adventureHistory: _readAdventureHistory(prefs),
     );
 
     // A save written by an older build may name a cat that is now locked.
     // Fall back to the default so the player never starts as a locked cat.
     if (!state.canSelectCat(state.selectedCat)) {
-      state.selectedCat = defaultCat;
+      state.selectedCat = SaveManager.defaultCat;
       await save(state);
     }
 
@@ -52,6 +55,15 @@ class SaveManager {
         .toSet();
   }
 
+  static List<HistoryEntry> _readAdventureHistory(SharedPreferences prefs) {
+    final raw = prefs.getString(_adventureHistoryKey);
+    if (raw == null || raw.isEmpty) return [];
+    final List<dynamic> decoded = jsonDecode(raw) as List<dynamic>;
+    return decoded
+        .map((e) => HistoryEntry.fromJson(e as Map<String, dynamic>))
+        .toList();
+  }
+
   static Future<void> save(GameState state) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt(_highestLevelKey, state.highestUnlockedLevel);
@@ -63,6 +75,10 @@ class SaveManager {
     await prefs.setString(
       _completedLevelsKey,
       state.completedLevels.map((e) => e.toString()).join(','),
+    );
+    await prefs.setString(
+      _adventureHistoryKey,
+      jsonEncode(state.adventureHistory.map((e) => e.toJson()).toList()),
     );
   }
 
@@ -76,6 +92,57 @@ class SaveManager {
     await prefs.remove(_highScoreKey);
     await prefs.remove(_pawCoinsKey);
     await prefs.remove(_completedLevelsKey);
+    await prefs.remove(_adventureHistoryKey);
+  }
+
+  /// Loads the adventure history from shared preferences.
+  /// Assigns a fresh unique id to any old entries missing an id and re-saves.
+  static Future<List<HistoryEntry>> loadHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_adventureHistoryKey);
+    if (raw == null || raw.isEmpty) {
+      return [];
+    }
+    final List<dynamic> decoded = jsonDecode(raw) as List<dynamic>;
+    List<HistoryEntry> history = decoded
+        .map((e) => HistoryEntry.fromJson(e as Map<String, dynamic>))
+        .toList();
+    // Check if any entry had a missing id in the JSON (so we assigned a new one)
+    final List<dynamic> jsonList = jsonDecode(raw) as List<dynamic>;
+    bool needsSave = false;
+    for (final map in jsonList) {
+      if (map is! Map<String, dynamic> || !map.containsKey('id')) {
+        needsSave = true;
+        break;
+      }
+    }
+    if (needsSave) {
+      await saveHistory(history);
+    }
+    return history;
+  }
+
+  /// Saves the given adventure history to shared preferences.
+  static Future<void> saveHistory(List<HistoryEntry> history) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _adventureHistoryKey,
+      jsonEncode(history.map((e) => e.toJson()).toList()),
+    );
+  }
+
+  /// Adds a history entry to the adventure history.
+  static Future<void> addHistoryEntry(HistoryEntry entry) async {
+    final history = await loadHistory();
+    history.add(entry);
+    await saveHistory(history);
+  }
+
+  /// Deletes the history entry with the given id from the adventure history.
+  static Future<void> deleteHistoryEntryById(String id) async {
+    final history = await loadHistory();
+    history.removeWhere((entry) => entry.id == id);
+    await saveHistory(history);
   }
 }
 
@@ -105,6 +172,7 @@ class GameState extends ChangeNotifier {
   /// Levels the player has cleared at least once. Drives the first-clear
   /// Paw Coin bonus and cat availability.
   final Set<int> _completedLevels;
+  final List<HistoryEntry> _adventureHistory;
 
   /// Resolves which cat the player may actually select. If the requested cat
   /// is not both owned and available (level requirement met), falls back to
@@ -121,8 +189,14 @@ class GameState extends ChangeNotifier {
     if (cat == 'kuro') return cat;
     // Luna / Mochi require both ownership and level completion.
     final catData = CatSkins.byName(cat);
-    final owned = catData.name == 'luna' ? lunaOwned : catData.name == 'mochi' ? mochiOwned : false;
-    final available = catData.unlockLevel <= 0 || completedLevels.contains(catData.unlockLevel);
+    final owned = catData.name == 'luna'
+        ? lunaOwned
+        : catData.name == 'mochi'
+        ? mochiOwned
+        : false;
+    final available =
+        catData.unlockLevel <= 0 ||
+        completedLevels.contains(catData.unlockLevel);
     return (owned && available) ? cat : SaveManager.defaultCat;
   }
 
@@ -134,20 +208,22 @@ class GameState extends ChangeNotifier {
     int highScore = 0,
     int pawCoins = 0,
     Set<int>? completedLevels,
-  })  : _completedLevels = completedLevels ?? {},
-        _highestUnlockedLevel = _clampLevel(highestUnlockedLevel),
-        _selectedCat = _resolveSelectedCat(
-          selectedCat,
-          lunaOwned,
-          mochiOwned,
-          completedLevels ?? {},
-        ),
-        _lunaOwned = lunaOwned,
-        _mochiOwned = mochiOwned,
-        // ignore: prefer_initializing_formals
-        _highScore = highScore,
-        // ignore: prefer_initializing_formals
-        _pawCoins = pawCoins;
+    List<HistoryEntry>? adventureHistory,
+  }) : _completedLevels = completedLevels ?? {},
+       _adventureHistory = adventureHistory ?? [],
+       _highestUnlockedLevel = _clampLevel(highestUnlockedLevel),
+       _selectedCat = _resolveSelectedCat(
+         selectedCat,
+         lunaOwned,
+         mochiOwned,
+         completedLevels ?? {},
+       ),
+       _lunaOwned = lunaOwned,
+       _mochiOwned = mochiOwned,
+       // ignore: prefer_initializing_formals
+       _highScore = highScore,
+       // ignore: prefer_initializing_formals
+       _pawCoins = pawCoins;
 
   // ------------------------------------------------------------------
   // Ownership helpers
@@ -236,6 +312,11 @@ class GameState extends ChangeNotifier {
     }
   }
 
+  /// Records a completed level in the adventure history.
+  void addAdventureHistoryEntry(HistoryEntry entry) {
+    _adventureHistory.add(entry);
+  }
+
   // ------------------------------------------------------------------
   // Cat selection & purchase
   // ------------------------------------------------------------------
@@ -312,22 +393,31 @@ class GameState extends ChangeNotifier {
   // ------------------------------------------------------------------
 
   Set<int> get completedLevels => Set.unmodifiable(_completedLevels);
+  List<HistoryEntry> get adventureHistory =>
+      List.unmodifiable(_adventureHistory);
 
   Map<String, dynamic> toJson() => {
-        'highestUnlockedLevel': _highestUnlockedLevel,
-        'lunaOwned': _lunaOwned,
-        'mochiOwned': _mochiOwned,
-        'selectedCat': _selectedCat,
-        'highScore': _highScore,
-        'pawCoins': _pawCoins,
-        'completedLevels': _completedLevels.toList()..sort(),
-      };
+    'highestUnlockedLevel': _highestUnlockedLevel,
+    'lunaOwned': _lunaOwned,
+    'mochiOwned': _mochiOwned,
+    'selectedCat': _selectedCat,
+    'highScore': _highScore,
+    'pawCoins': _pawCoins,
+    'completedLevels': _completedLevels.toList()..sort(),
+    'adventureHistory': _adventureHistory.map((e) => e.toJson()).toList(),
+  };
 
   factory GameState.fromJson(Map<String, dynamic> json) {
     final rawCompleted = json['completedLevels'];
     final completed = rawCompleted is List
         ? rawCompleted.map((e) => e as int).toSet()
         : <int>{};
+    final rawHistory = json['adventureHistory'];
+    final history = rawHistory is List
+        ? rawHistory
+              .map((e) => HistoryEntry.fromJson(e as Map<String, dynamic>))
+              .toList()
+        : <HistoryEntry>[];
     return GameState(
       highestUnlockedLevel: json['highestUnlockedLevel'] as int? ?? 1,
       lunaOwned: json['lunaOwned'] as bool? ?? false,
@@ -336,6 +426,7 @@ class GameState extends ChangeNotifier {
       highScore: json['highScore'] as int? ?? 0,
       pawCoins: json['pawCoins'] as int? ?? 0,
       completedLevels: completed,
+      adventureHistory: history,
     );
   }
 

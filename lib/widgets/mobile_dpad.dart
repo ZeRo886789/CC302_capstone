@@ -27,11 +27,11 @@ class MobileDPad extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget arrow(PlayerDirection direction) => _HoldButton(
-          arrow: direction,
-          onPressed: onDirectionPressed,
-          onHeld: onDirectionHeld,
-          onReleased: onDirectionReleased,
-        );
+      arrow: direction,
+      onPressed: onDirectionPressed,
+      onHeld: onDirectionHeld,
+      onReleased: onDirectionReleased,
+    );
 
     final width = buttonSize * 3 + gap * 2;
     final height = buttonSize * 3 + gap * 2;
@@ -221,12 +221,7 @@ class _PixelArrowPainter extends CustomPainter {
     final paint = Paint()..color = color;
     for (final cell in cells) {
       canvas.drawRect(
-        Rect.fromLTWH(
-          cell.dx * unit,
-          cell.dy * unit,
-          unit,
-          unit,
-        ),
+        Rect.fromLTWH(cell.dx * unit, cell.dy * unit, unit, unit),
         paint,
       );
     }
@@ -258,9 +253,7 @@ class _CenterButton extends StatelessWidget {
             border: Border.all(color: GameColors.border, width: 3),
           ),
           child: CustomPaint(
-            painter: _PixelPausePainter(
-              color: GameColors.gray,
-            ),
+            painter: _PixelPausePainter(color: GameColors.gray),
             size: const Size(24, 24),
           ),
         ),
@@ -280,10 +273,7 @@ class _PixelPausePainter extends CustomPainter {
     final unit = size.width / 6;
     final paint = Paint()..color = color;
     for (final x in const [1.0, 2.0, 4.0, 5.0]) {
-      canvas.drawRect(
-        Rect.fromLTWH(x * unit, unit, unit, unit * 4),
-        paint,
-      );
+      canvas.drawRect(Rect.fromLTWH(x * unit, unit, unit, unit * 4), paint);
     }
   }
 

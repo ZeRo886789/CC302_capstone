@@ -236,7 +236,9 @@ class _CatCard extends StatelessWidget {
 
     return Semantics(
       button: canInteract,
-      label: canInteract ? cat.name.toUpperCase() : 'LOCKED - ${cat.name.toUpperCase()}',
+      label: canInteract
+          ? cat.name.toUpperCase()
+          : 'LOCKED - ${cat.name.toUpperCase()}',
       onTap: canInteract ? onTap : null,
       child: GestureDetector(
         onTap: canInteract ? onTap : null,

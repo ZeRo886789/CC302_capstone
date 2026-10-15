@@ -15,11 +15,9 @@ class GameConfig {
   static const int mazeColumns = 15;
   static const int mazeRows = 21;
 
-  static const double boardWidth =
-      mazeColumns * tileSize;
+  static const double boardWidth = mazeColumns * tileSize;
 
-  static const double boardHeight =
-      mazeRows * tileSize;
+  static const double boardHeight = mazeRows * tileSize;
 
   // ------------------------------------------------------------
   // CAMERA
@@ -62,9 +60,7 @@ class GameConfig {
   // HELPERS
   // ------------------------------------------------------------
 
-  static double cellCenterX(int column) =>
-      column * tileSize + tileSize / 2;
+  static double cellCenterX(int column) => column * tileSize + tileSize / 2;
 
-  static double cellCenterY(int row) =>
-      row * tileSize + tileSize / 2;
+  static double cellCenterY(int row) => row * tileSize + tileSize / 2;
 }

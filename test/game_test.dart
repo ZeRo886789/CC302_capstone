@@ -9,6 +9,7 @@ import 'package:pawquest/game/data/levels.dart';
 import 'package:pawquest/game/systems/collision_system.dart';
 import 'package:pawquest/game/systems/save_manager.dart';
 import 'package:pawquest/game/systems/score_manager.dart';
+import 'package:pawquest/models/history_entry.dart';
 
 /// Note: sprite *loading* is deliberately not covered here. `flutter_test` has
 /// no asset bundle, so `Sprite.load` cannot resolve under `flutter test`. The
@@ -757,7 +758,88 @@ group('progression and save data', () {
   test('unknown cat names are never unlocked', () {
     final state = GameState();
     expect(state.isCatUnlocked('unknown'), isFalse);
-       expect(state.isCatUnlocked(''), isFalse);
+    expect(state.isCatUnlocked(''), isFalse);
+  });
+
+  test('fresh save only unlocks level 1 (not all levels)', () {
+    SharedPreferences.setMockInitialValues({});
+    SaveManager.load().then((state) {
+      expect(state.highestUnlockedLevel, 1,
+          reason: 'Fresh save should have only level 1 unlocked');
+      expect(state.isLevelUnlocked(1), isTrue);
+      expect(state.isLevelUnlocked(2), isFalse,
+          reason: 'Level 2 should be locked on fresh save');
+      expect(state.isLevelUnlocked(3), isFalse);
+      expect(state.isLevelUnlocked(4), isFalse);
+      expect(state.isLevelUnlocked(5), isFalse);
     });
   });
+
+  test('completing level 1 unlocks level 2 and records one history entry',
+      () async {
+    SharedPreferences.setMockInitialValues({});
+    final state = GameState(
+      highestUnlockedLevel: 1,
+      lunaOwned: false,
+      mochiOwned: false,
+      selectedCat: 'kuro',
+      highScore: 0,
+      pawCoins: 0,
+      completedLevels: {},
+      adventureHistory: [],
+    );
+
+    // Simulate completing level 1
+    state.onLevelCompleted(1);
+    state.addAdventureHistoryEntry(
+      HistoryEntry(
+        level: 1,
+        levelName: 'Classic',
+        score: 1000,
+        formattedTime: '01:30',
+        date: DateTime.now(),
+      ),
+    );
+    await SaveManager.save(state);
+
+    // Verify level 2 is unlocked
+    expect(state.isLevelUnlocked(2), isTrue,
+        reason: 'Level 2 should be unlocked after completing Level 1');
+    expect(state.isLevelUnlocked(3), isFalse,
+        reason: 'Level 3 should still be locked');
+
+    // Reload from save
+    final loaded = await SaveManager.load();
+    expect(loaded.isLevelUnlocked(2), isTrue,
+        reason: 'Level 2 should still be unlocked after save/load');
+    expect(loaded.adventureHistory.length, 1,
+        reason: 'History should have exactly one entry after save/load');
+    expect(loaded.adventureHistory.first.level, 1);
+  });
+
+test('history delete still works after fixes', () async {
+    SharedPreferences.setMockInitialValues({});
+    final state = GameState(
+      highestUnlockedLevel: 1,
+      adventureHistory: [
+        HistoryEntry(
+          level: 1,
+          levelName: 'Test',
+          score: 100,
+          formattedTime: '00:30',
+          date: DateTime.now(),
+        ),
+      ],
+    );
+    await SaveManager.save(state);
+
+// Delete the history entry
+    await SaveManager.deleteHistoryEntryById(state.adventureHistory.first.id);
+
+    // Reload and verify it's gone
+    final loaded = await SaveManager.load();
+    expect(loaded.adventureHistory, isEmpty,
+        reason: 'History should be empty after deletion');
+  });
+});
 }

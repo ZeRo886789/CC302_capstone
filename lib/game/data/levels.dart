@@ -3,13 +3,7 @@ import 'level_data.dart';
 class Levels {
   Levels._();
 
-  static final List<LevelData> all = [
-    level1,
-    level2,
-    level3,
-    level4,
-    level5,
-  ];
+  static final List<LevelData> all = [level1, level2, level3, level4, level5];
 
   static LevelData getLevel(int number) {
     if (number < 1 || number > all.length) {

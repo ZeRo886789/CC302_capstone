@@ -53,11 +53,7 @@ class _ShopScreenState extends State<ShopScreen> {
         child: Column(
           children: [
             const SizedBox(height: 12),
-            const PixelText(
-              'PAW SHOP',
-              height: 16,
-              color: GameColors.yellow,
-            ),
+            const PixelText('PAW SHOP', height: 16, color: GameColors.yellow),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -151,10 +147,7 @@ class _ShopScreenState extends State<ShopScreen> {
     } else {
       label = Text(
         cat.requirementText,
-        style: const TextStyle(
-          color: GameColors.gray,
-          fontSize: 11,
-        ),
+        style: const TextStyle(color: GameColors.gray, fontSize: 11),
       );
     }
 

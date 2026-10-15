@@ -65,13 +65,10 @@ class _ArcadeMenuOptionState extends State<ArcadeMenuOption> {
   @override
   void initState() {
     super.initState();
-    _blinkTimer = Timer.periodic(
-      const Duration(milliseconds: 450),
-      (_) {
-        if (!mounted) return;
-        setState(() => _showCursor = !_showCursor);
-      },
-    );
+    _blinkTimer = Timer.periodic(const Duration(milliseconds: 450), (_) {
+      if (!mounted) return;
+      setState(() => _showCursor = !_showCursor);
+    });
   }
 
   @override

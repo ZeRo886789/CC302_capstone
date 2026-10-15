@@ -15,14 +15,14 @@ class Fish extends SpriteAnimationComponent {
     required this.gridY,
     required double visualSize,
   }) : super(
-          animation: animation,
-          position: Vector2(
-            GameConfig.cellCenterX(gridX),
-            GameConfig.cellCenterY(gridY),
-          ),
-          size: Vector2.all(visualSize),
-          anchor: Anchor.center,
-        ) {
+         animation: animation,
+         position: Vector2(
+           GameConfig.cellCenterX(gridX),
+           GameConfig.cellCenterY(gridY),
+         ),
+         size: Vector2.all(visualSize),
+         anchor: Anchor.center,
+       ) {
     paint.filterQuality = FilterQuality.none;
   }
 
@@ -61,29 +61,21 @@ class Fish extends SpriteAnimationComponent {
   void update(double dt) {
     super.update(dt);
     _bobOffset += dt * 3;
-    position.setFrom(Vector2(
-      GameConfig.cellCenterX(gridX),
-      GameConfig.cellCenterY(gridY) + sin(_bobOffset) * 2,
-    ));
+    position.setFrom(
+      Vector2(
+        GameConfig.cellCenterX(gridX),
+        GameConfig.cellCenterY(gridY) + sin(_bobOffset) * 2,
+      ),
+    );
   }
 
   @override
   void render(Canvas canvas) {
     final glowPaint = Paint()
       ..color = const Color(0x5533AAFF)
-      ..maskFilter = const MaskFilter.blur(
-        BlurStyle.normal,
-        4,
-      );
+      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 4);
 
-    canvas.drawCircle(
-      Offset(
-        size.x / 2,
-        size.y / 2,
-      ),
-      size.x * 0.45,
-      glowPaint,
-    );
+    canvas.drawCircle(Offset(size.x / 2, size.y / 2), size.x * 0.45, glowPaint);
 
     super.render(canvas);
   }

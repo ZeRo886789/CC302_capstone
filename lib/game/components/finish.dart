@@ -17,13 +17,13 @@ class FinishFlag extends PositionComponent {
     required this.gridX,
     required this.gridY,
   }) : super(
-          position: Vector2(
-            GameConfig.cellCenterX(gridX),
-            GameConfig.cellCenterY(gridY),
-          ),
-          size: Vector2.all(GameConfig.flagVisualSize),
-          anchor: Anchor.center,
-        );
+         position: Vector2(
+           GameConfig.cellCenterX(gridX),
+           GameConfig.cellCenterY(gridY),
+         ),
+         size: Vector2.all(GameConfig.flagVisualSize),
+         anchor: Anchor.center,
+       );
 
   final LevelData levelData;
   final int gridX;
@@ -88,9 +88,13 @@ class FinishFlag extends PositionComponent {
       _pulsePhase += dt * 2;
       if (_glowSprite != null) {
         _glowIntensity = 0.2 + math.sin(_pulsePhase) * 0.1;
-        _glowSprite!.paint.color = Colors.white.withValues(alpha: _glowIntensity);
+        _glowSprite!.paint.color = Colors.white.withValues(
+          alpha: _glowIntensity,
+        );
         final lockedScale = 1 + math.sin(_pulsePhase) * 0.05;
-        _glowSprite!.size = Vector2.all(GameConfig.flagVisualSize * _config.glowScale! * lockedScale);
+        _glowSprite!.size = Vector2.all(
+          GameConfig.flagVisualSize * _config.glowScale! * lockedScale,
+        );
       }
       return;
     }
@@ -136,7 +140,9 @@ class FinishFlag extends PositionComponent {
       _glowIntensity = 0.3 + math.sin(_pulsePhase * 0.8) * 0.2;
       _glowSprite!.paint.color = Colors.amber.withValues(alpha: _glowIntensity);
       final glowPulse = 1 + math.sin(_pulsePhase * 0.8) * 0.15;
-      _glowSprite!.size = Vector2.all(GameConfig.flagVisualSize * _config.glowScale! * glowPulse);
+      _glowSprite!.size = Vector2.all(
+        GameConfig.flagVisualSize * _config.glowScale! * glowPulse,
+      );
     }
   }
 
@@ -145,9 +151,13 @@ class FinishFlag extends PositionComponent {
     if (_glowSprite != null) {
       _glowSprite!.angle = _pulsePhase * 0.5;
       final glowPulse = 1 + math.sin(_pulsePhase * 1.2) * 0.2;
-      _glowSprite!.size = Vector2.all(GameConfig.flagVisualSize * _config.glowScale! * glowPulse);
+      _glowSprite!.size = Vector2.all(
+        GameConfig.flagVisualSize * _config.glowScale! * glowPulse,
+      );
       _glowIntensity = 0.4 + math.sin(_pulsePhase * 1.5) * 0.3;
-      _glowSprite!.paint.color = Colors.cyanAccent.withValues(alpha: _glowIntensity);
+      _glowSprite!.paint.color = Colors.cyanAccent.withValues(
+        alpha: _glowIntensity,
+      );
     }
   }
 
@@ -162,7 +172,9 @@ class FinishFlag extends PositionComponent {
         colorShift,
       )!.withValues(alpha: _glowIntensity);
       final glowPulse = 1 + math.sin(_pulsePhase * 2) * 0.25;
-      _glowSprite!.size = Vector2.all(GameConfig.flagVisualSize * _config.glowScale! * glowPulse);
+      _glowSprite!.size = Vector2.all(
+        GameConfig.flagVisualSize * _config.glowScale! * glowPulse,
+      );
     }
   }
 
@@ -172,7 +184,9 @@ class FinishFlag extends PositionComponent {
       _glowIntensity = 0.6 + math.sin(_pulsePhase * 1.0) * 0.25;
       _glowSprite!.paint.color = Colors.amber.withValues(alpha: _glowIntensity);
       final glowPulse = 1 + math.sin(_pulsePhase * 0.8) * 0.2;
-      _glowSprite!.size = Vector2.all(GameConfig.flagVisualSize * _config.glowScale! * glowPulse);
+      _glowSprite!.size = Vector2.all(
+        GameConfig.flagVisualSize * _config.glowScale! * glowPulse,
+      );
     }
   }
 
@@ -193,7 +207,9 @@ class FinishFlag extends PositionComponent {
         _glowIntensity,
       );
       final glowPulse = 1 + math.sin(_pulsePhase * 1.5) * 0.3;
-      _glowSprite!.size = Vector2.all(GameConfig.flagVisualSize * _config.glowScale! * glowPulse);
+      _glowSprite!.size = Vector2.all(
+        GameConfig.flagVisualSize * _config.glowScale! * glowPulse,
+      );
       _glowSprite!.angle = _pulsePhase * 0.3;
     }
 
@@ -208,18 +224,23 @@ class FinishFlag extends PositionComponent {
 
     for (int i = 0; i < count; i++) {
       final angle = math.Random().nextDouble() * 2 * math.pi;
-      final speed = _config.particleSpeed * (0.5 + math.Random().nextDouble() * 0.5);
-      final lifetime = _config.particleLifetime * (0.5 + math.Random().nextDouble() * 0.5);
-      final size = _config.particleSize * (0.5 + math.Random().nextDouble() * 0.5);
+      final speed =
+          _config.particleSpeed * (0.5 + math.Random().nextDouble() * 0.5);
+      final lifetime =
+          _config.particleLifetime * (0.5 + math.Random().nextDouble() * 0.5);
+      final size =
+          _config.particleSize * (0.5 + math.Random().nextDouble() * 0.5);
 
-      _particles.add(_FinishParticle(
-        position: position.clone(),
-        velocity: Vector2(math.cos(angle), math.sin(angle)) * speed,
-        lifetime: lifetime,
-        maxLifetime: lifetime,
-        size: size,
-        color: _config.particleColor,
-      ));
+      _particles.add(
+        _FinishParticle(
+          position: position.clone(),
+          velocity: Vector2(math.cos(angle), math.sin(angle)) * speed,
+          lifetime: lifetime,
+          maxLifetime: lifetime,
+          size: size,
+          color: _config.particleColor,
+        ),
+      );
     }
   }
 
